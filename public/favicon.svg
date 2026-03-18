@@ -1,0 +1,5 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100" height="100" rx="20" fill="#1a3cff"/>
+  <!-- M shape: two outer legs + center V -->
+  <path d="M14 82 L14 18 L28 18 L50 48 L72 18 L86 18 L86 82 L72 82 L72 44 L50 66 L28 44 L28 82 Z" fill="white"/>
+</svg>
