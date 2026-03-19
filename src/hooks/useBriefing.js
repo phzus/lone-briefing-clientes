@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { CLIENTS, UNIVERSAL_QUESTIONS } from '@/data/clients'
 import { supabase } from '@/lib/supabase'
 
@@ -26,6 +26,9 @@ export function useBriefing() {
   const [completedClients, setCompletedClients] = useState({})
   const [loading, setLoading] = useState(true)
 
+  // Evita loop: quando recebemos update remoto, não re-salvamos no Supabase
+  const skipNextSave = useRef(false)
+
   // Load from Supabase on mount, fallback to localStorage
   useEffect(() => {
     async function load() {
@@ -43,13 +46,11 @@ export function useBriefing() {
           setCompletedClients(data.completed ?? {})
           saveLocal(data.answers ?? {}, data.completed ?? {})
         } else {
-          // Nenhum registro ainda — tenta local
           const local = loadLocal()
           setFormData(local.formData)
           setCompletedClients(local.completedClients)
         }
       } catch {
-        // Supabase indisponível — usa localStorage
         const local = loadLocal()
         setFormData(local.formData)
         setCompletedClients(local.completedClients)
@@ -61,11 +62,41 @@ export function useBriefing() {
     load()
   }, [])
 
-  // Debounce: salva no Supabase 1.5s após a última alteração
+  // Realtime: escuta mudanças feitas por outros usuários
+  useEffect(() => {
+    if (loading) return
+
+    const channel = supabase
+      .channel('briefings-sync')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'briefings', filter: `id=eq.${RECORD_ID}` },
+        (payload) => {
+          const remote = payload.new
+          if (!remote) return
+          skipNextSave.current = true
+          setFormData(remote.answers ?? {})
+          setCompletedClients(remote.completed ?? {})
+          saveLocal(remote.answers ?? {}, remote.completed ?? {})
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [loading])
+
+  // Autosave: salva no Supabase 1.5s após a última alteração local
   useEffect(() => {
     if (loading) return
 
     saveLocal(formData, completedClients)
+
+    if (skipNextSave.current) {
+      skipNextSave.current = false
+      return
+    }
 
     const timer = setTimeout(async () => {
       try {
