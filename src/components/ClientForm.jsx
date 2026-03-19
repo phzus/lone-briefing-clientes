@@ -60,9 +60,10 @@ export function ClientForm({ client, getValue, setValue, getProgress, isComplete
             <QuestionCard
               key={q.id}
               question={q}
-              clientId={client.id}
               value={getValue(client.id, q.id)}
               onChange={v => setValue(client.id, q.id, v)}
+              obsValue={getValue(client.id, q.id + '__obs')}
+              onObsChange={v => setValue(client.id, q.id + '__obs', v)}
             />
           ))}
         </div>
@@ -79,9 +80,10 @@ export function ClientForm({ client, getValue, setValue, getProgress, isComplete
             <QuestionCard
               key={q.id}
               question={q}
-              clientId={client.id}
               value={getValue(client.id, q.id)}
               onChange={v => setValue(client.id, q.id, v)}
+              obsValue={getValue(client.id, q.id + '__obs')}
+              onObsChange={v => setValue(client.id, q.id + '__obs', v)}
             />
           ))}
         </div>

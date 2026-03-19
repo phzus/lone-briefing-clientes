@@ -130,13 +130,19 @@ export function useBriefing() {
     UNIVERSAL_QUESTIONS.forEach(q => {
       const raw = formData[client.id]?.[q.id]
       const v = Array.isArray(raw) ? (raw.length > 0 ? raw.join(', ') : '(não respondida)') : (raw || '(não respondida)')
-      text += `${q.num}. ${q.label}\n   → ${v}\n\n`
+      const obs = formData[client.id]?.[q.id + '__obs']
+      text += `${q.num}. ${q.label}\n   → ${v}\n`
+      if (obs && obs.trim()) text += `   💬 ${obs.trim()}\n`
+      text += '\n'
     })
     text += `\n📌 PERGUNTAS ESPECÍFICAS — ${client.name.toUpperCase()}\n${dash}\n\n`
     client.questions.forEach(q => {
       const raw = formData[client.id]?.[q.id]
       const v = Array.isArray(raw) ? (raw.length > 0 ? raw.join(', ') : '(não respondida)') : (raw || '(não respondida)')
-      text += `${q.num}. ${q.label}\n   → ${v}\n\n`
+      const obs = formData[client.id]?.[q.id + '__obs']
+      text += `${q.num}. ${q.label}\n   → ${v}\n`
+      if (obs && obs.trim()) text += `   💬 ${obs.trim()}\n`
+      text += '\n'
     })
     text += `${div}\n  Briefing gerado pela plataforma interna Lone Mídia\n${div}`
     return text

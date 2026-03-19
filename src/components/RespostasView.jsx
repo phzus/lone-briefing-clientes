@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileText, CheckCircle2 } from 'lucide-react'
+import { FileText, CheckCircle2, MessageSquare } from 'lucide-react'
 import { CLIENTS, UNIVERSAL_QUESTIONS } from '@/data/clients'
 import { BriefingModal } from '@/components/BriefingModal'
 import { Badge } from '@/components/ui/badge'
@@ -13,8 +13,9 @@ function normalizeValue(v) {
   return null
 }
 
-function AnswerRow({ question, value }) {
+function AnswerRow({ question, value, obsValue }) {
   const display = normalizeValue(value)
+  const obs = obsValue && String(obsValue).trim() !== '' ? String(obsValue).trim() : null
   return (
     <div className="py-2.5 border-b border-border last:border-0">
       <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
@@ -27,6 +28,12 @@ function AnswerRow({ question, value }) {
       )}>
         {display ?? '(não respondida)'}
       </p>
+      {obs && (
+        <div className="mt-1.5 flex items-start gap-1.5 text-xs text-amber-400/80">
+          <MessageSquare className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+          <span className="whitespace-pre-wrap">{obs}</span>
+        </div>
+      )}
     </div>
   )
 }
@@ -80,13 +87,13 @@ function ClientCard({ client, getValue, getProgress, isCompleted, generateBriefi
           Perguntas Universais
         </p>
         {UNIVERSAL_QUESTIONS.map(q => (
-          <AnswerRow key={q.id} question={q} value={getValue(client.id, q.id)} />
+          <AnswerRow key={q.id} question={q} value={getValue(client.id, q.id)} obsValue={getValue(client.id, q.id + '__obs')} />
         ))}
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pt-4 pb-1">
           Perguntas Específicas
         </p>
         {client.questions.map(q => (
-          <AnswerRow key={q.id} question={q} value={getValue(client.id, q.id)} />
+          <AnswerRow key={q.id} question={q} value={getValue(client.id, q.id)} obsValue={getValue(client.id, q.id + '__obs')} />
         ))}
         <div className="h-3" />
       </div>
