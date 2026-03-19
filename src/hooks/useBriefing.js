@@ -100,7 +100,8 @@ export function useBriefing() {
     const all = [...UNIVERSAL_QUESTIONS, ...client.questions]
     const filled = all.filter(q => {
       const v = formData[clientId]?.[q.id]
-      return v && v.trim() !== ''
+      if (Array.isArray(v)) return v.length > 0
+      return v != null && String(v).trim() !== ''
     }).length
     return { filled, total: all.length, pct: Math.round((filled / all.length) * 100) }
   }, [formData])
@@ -127,12 +128,14 @@ export function useBriefing() {
     text += `  Cliente:    ${client.name}\n  Segmento:   ${client.segment}\n  Gerado em:  ${dateStr}\n${div}\n\n`
     text += `📋 PERGUNTAS UNIVERSAIS\n${dash}\n\n`
     UNIVERSAL_QUESTIONS.forEach(q => {
-      const v = formData[client.id]?.[q.id] || '(não respondida)'
+      const raw = formData[client.id]?.[q.id]
+      const v = Array.isArray(raw) ? (raw.length > 0 ? raw.join(', ') : '(não respondida)') : (raw || '(não respondida)')
       text += `${q.num}. ${q.label}\n   → ${v}\n\n`
     })
     text += `\n📌 PERGUNTAS ESPECÍFICAS — ${client.name.toUpperCase()}\n${dash}\n\n`
     client.questions.forEach(q => {
-      const v = formData[client.id]?.[q.id] || '(não respondida)'
+      const raw = formData[client.id]?.[q.id]
+      const v = Array.isArray(raw) ? (raw.length > 0 ? raw.join(', ') : '(não respondida)') : (raw || '(não respondida)')
       text += `${q.num}. ${q.label}\n   → ${v}\n\n`
     })
     text += `${div}\n  Briefing gerado pela plataforma interna Lone Mídia\n${div}`

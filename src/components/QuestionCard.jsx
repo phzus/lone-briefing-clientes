@@ -4,7 +4,14 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
 
 export function QuestionCard({ question, clientId, value, onChange }) {
-  const isAnswered = value && value.trim() !== ''
+  // Normaliza: string legada → array de um item, vazio → []
+  const arrayValue = Array.isArray(value)
+    ? value
+    : (value && value.trim() !== '' ? [value] : [])
+
+  const isAnswered = question.type === 'pills'
+    ? arrayValue.length > 0
+    : (value != null && String(value).trim() !== '')
 
   return (
     <div className={cn(
@@ -18,9 +25,9 @@ export function QuestionCard({ question, clientId, value, onChange }) {
 
       {question.type === 'pills' && (
         <ToggleGroup
-          type="single"
-          value={value}
-          onValueChange={(v) => { if (v) onChange(v) }}
+          type="multiple"
+          value={arrayValue}
+          onValueChange={(v) => onChange(v)}
         >
           {question.options.map(opt => (
             <ToggleGroupItem key={opt} value={opt}>

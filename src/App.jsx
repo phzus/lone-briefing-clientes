@@ -4,11 +4,13 @@ import { CLIENTS } from '@/data/clients'
 import { useBriefing } from '@/hooks/useBriefing'
 import { Sidebar } from '@/components/Sidebar'
 import { ClientForm } from '@/components/ClientForm'
+import { RespostasView } from '@/components/RespostasView'
 import { Button } from '@/components/ui/button'
 
 export default function App() {
   const [activeId, setActiveId] = useState(CLIENTS[0].id)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [activeView, setActiveView] = useState('form') // 'form' | 'respostas'
 
   const briefing = useBriefing()
   const activeClient = CLIENTS.find(c => c.id === activeId)
@@ -44,6 +46,8 @@ export default function App() {
           getProgress={briefing.getProgress}
           isCompleted={briefing.isCompleted}
           completedCount={briefing.completedCount}
+          activeView={activeView}
+          onViewChange={setActiveView}
         />
       </div>
 
@@ -58,6 +62,8 @@ export default function App() {
               getProgress={briefing.getProgress}
               isCompleted={briefing.isCompleted}
               completedCount={briefing.completedCount}
+              activeView={activeView}
+              onViewChange={setActiveView}
             />
           </div>
         </div>
@@ -70,7 +76,9 @@ export default function App() {
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
-          <span className="font-semibold text-sm flex-1 truncate">{activeClient?.name}</span>
+          <span className="font-semibold text-sm flex-1 truncate">
+            {activeView === 'respostas' ? 'Respostas' : activeClient?.name}
+          </span>
           <span className="text-xs font-bold text-primary bg-primary/10 border border-primary/25 px-2.5 py-1 rounded-full">
             {briefing.completedCount}/{CLIENTS.length}
           </span>
@@ -78,19 +86,29 @@ export default function App() {
 
         {/* Form scroll area */}
         <main className="flex-1 overflow-y-auto">
-          {activeClient && (
-            <ClientForm
-              key={activeId}
-              client={activeClient}
+          {activeView === 'respostas' ? (
+            <RespostasView
               getValue={briefing.getValue}
-              setValue={briefing.setValue}
               getProgress={briefing.getProgress}
               isCompleted={briefing.isCompleted}
-              markComplete={briefing.markComplete}
               generateBriefingText={briefing.generateBriefingText}
-              onNext={() => nextClient && setActiveId(nextClient.id)}
-              nextClient={nextClient}
+              completedCount={briefing.completedCount}
             />
+          ) : (
+            activeClient && (
+              <ClientForm
+                key={activeId}
+                client={activeClient}
+                getValue={briefing.getValue}
+                setValue={briefing.setValue}
+                getProgress={briefing.getProgress}
+                isCompleted={briefing.isCompleted}
+                markComplete={briefing.markComplete}
+                generateBriefingText={briefing.generateBriefingText}
+                onNext={() => nextClient && setActiveId(nextClient.id)}
+                nextClient={nextClient}
+              />
+            )
           )}
         </main>
 
