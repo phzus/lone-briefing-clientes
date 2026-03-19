@@ -4,7 +4,7 @@ import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
-export function Sidebar({ activeId, onSelect, getProgress, isCompleted, completedCount, activeView, onViewChange }) {
+export function Sidebar({ activeId, onSelect, getProgress, getSegment, isCompleted, completedCount, activeView, onViewChange }) {
   const overallPct = Math.round((completedCount / CLIENTS.length) * 100)
 
   return (
@@ -87,7 +87,7 @@ export function Sidebar({ activeId, onSelect, getProgress, isCompleted, complete
                     </span>
                     {completed && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />}
                   </div>
-                  <p className="text-[11px] text-muted-foreground truncate mb-2">{client.segment}</p>
+                  <p className="text-[11px] text-muted-foreground truncate mb-2">{getSegment(client.id)}</p>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] text-muted-foreground shrink-0">{filled}/{total}</span>
                     <Progress

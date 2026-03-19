@@ -116,6 +116,12 @@ export function useBriefing() {
 
   const completedCount = Object.keys(completedClients).length
 
+  const getSegment = useCallback((clientId) => {
+    const stored = formData[clientId]?.['__segment']
+    if (stored && String(stored).trim() !== '') return String(stored).trim()
+    return CLIENTS.find(c => c.id === clientId)?.segment ?? ''
+  }, [formData])
+
   const generateBriefingText = useCallback((client) => {
     const now = new Date()
     const dateStr = now.toLocaleDateString('pt-BR', {
@@ -124,8 +130,9 @@ export function useBriefing() {
     })
     const div = '═'.repeat(52)
     const dash = '─'.repeat(52)
+    const segment = formData[client.id]?.['__segment']?.trim() || client.segment
     let text = `${div}\n  BRIEFING DE PASSAGEM — LONE MÍDIA\n${div}\n`
-    text += `  Cliente:    ${client.name}\n  Segmento:   ${client.segment}\n  Gerado em:  ${dateStr}\n${div}\n\n`
+    text += `  Cliente:    ${client.name}\n  Segmento:   ${segment}\n  Gerado em:  ${dateStr}\n${div}\n\n`
     text += `📋 PERGUNTAS UNIVERSAIS\n${dash}\n\n`
     UNIVERSAL_QUESTIONS.forEach(q => {
       const raw = formData[client.id]?.[q.id]
@@ -152,6 +159,7 @@ export function useBriefing() {
     loading,
     getValue, setValue,
     getProgress,
+    getSegment,
     markComplete, isCompleted,
     completedCount,
     generateBriefingText,

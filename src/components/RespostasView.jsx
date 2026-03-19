@@ -38,7 +38,7 @@ function AnswerRow({ question, value, obsValue }) {
   )
 }
 
-function ClientCard({ client, getValue, getProgress, isCompleted, generateBriefingText }) {
+function ClientCard({ client, getValue, getProgress, getSegment, isCompleted, generateBriefingText }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [briefingText, setBriefingText] = useState('')
   const { filled, total, pct } = getProgress(client.id)
@@ -63,7 +63,7 @@ function ClientCard({ client, getValue, getProgress, isCompleted, generateBriefi
               </span>
             )}
           </div>
-          <Badge variant="accent" className="mt-1.5">{client.segment}</Badge>
+          <Badge variant="accent" className="mt-1.5">{getSegment(client.id)}</Badge>
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <div className="text-right">
@@ -102,14 +102,14 @@ function ClientCard({ client, getValue, getProgress, isCompleted, generateBriefi
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         clientName={client.name}
-        segment={client.segment}
+        segment={getSegment(client.id)}
         text={briefingText}
       />
     </div>
   )
 }
 
-export function RespostasView({ getValue, getProgress, isCompleted, generateBriefingText, completedCount }) {
+export function RespostasView({ getValue, getProgress, getSegment, isCompleted, generateBriefingText, completedCount }) {
   return (
     <div className="max-w-3xl mx-auto px-6 py-10 pb-24">
       <div className="mb-8 pb-6 border-b border-border">
@@ -127,6 +127,7 @@ export function RespostasView({ getValue, getProgress, isCompleted, generateBrie
             client={client}
             getValue={getValue}
             getProgress={getProgress}
+            getSegment={getSegment}
             isCompleted={isCompleted}
             generateBriefingText={generateBriefingText}
           />

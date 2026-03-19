@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckCircle2, ChevronRight, Send } from 'lucide-react'
+import { CheckCircle2, ChevronRight, Send, Pencil } from 'lucide-react'
 import { UNIVERSAL_QUESTIONS } from '@/data/clients'
 import { CLIENTS } from '@/data/clients'
 import { QuestionCard } from '@/components/QuestionCard'
@@ -9,12 +9,14 @@ import { Progress } from '@/components/ui/progress'
 import { BriefingModal } from '@/components/BriefingModal'
 import { cn } from '@/lib/utils'
 
-export function ClientForm({ client, getValue, setValue, getProgress, isCompleted, markComplete, generateBriefingText, onNext, nextClient }) {
+export function ClientForm({ client, getValue, setValue, getProgress, getSegment, isCompleted, markComplete, generateBriefingText, onNext, nextClient }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [briefingText, setBriefingText] = useState('')
+  const [editingSegment, setEditingSegment] = useState(false)
 
   const { filled, total, pct } = getProgress(client.id)
   const completed = isCompleted(client.id)
+  const displaySegment = getSegment(client.id)
 
   function handleSubmit() {
     markComplete(client.id)
@@ -29,7 +31,27 @@ export function ClientForm({ client, getValue, setValue, getProgress, isComplete
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground leading-tight">{client.name}</h1>
-            <Badge variant="accent" className="mt-2">{client.segment}</Badge>
+            <div className="mt-2">
+              {editingSegment ? (
+                <input
+                  autoFocus
+                  value={getValue(client.id, '__segment') || client.segment}
+                  onChange={e => setValue(client.id, '__segment', e.target.value)}
+                  onBlur={() => setEditingSegment(false)}
+                  onKeyDown={e => e.key === 'Enter' && setEditingSegment(false)}
+                  className="text-xs font-medium bg-accent/20 border border-primary/40 rounded px-2 py-0.5 text-foreground focus:outline-none focus:ring-1 focus:ring-primary w-56"
+                />
+              ) : (
+                <button
+                  onClick={() => setEditingSegment(true)}
+                  className="inline-flex items-center gap-1 group"
+                  title="Clique para editar o segmento"
+                >
+                  <Badge variant="accent">{displaySegment}</Badge>
+                  <Pencil className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-60 transition-opacity" />
+                </button>
+              )}
+            </div>
           </div>
           <div className="text-right min-w-[140px]">
             <p className="text-xs text-muted-foreground mb-1.5">{filled} de {total} perguntas respondidas</p>
@@ -107,7 +129,7 @@ export function ClientForm({ client, getValue, setValue, getProgress, isComplete
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         clientName={client.name}
-        segment={client.segment}
+        segment={displaySegment}
         text={briefingText}
       />
     </div>

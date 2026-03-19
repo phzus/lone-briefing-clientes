@@ -44,6 +44,7 @@ export default function App() {
           activeId={activeId}
           onSelect={handleSelect}
           getProgress={briefing.getProgress}
+          getSegment={briefing.getSegment}
           isCompleted={briefing.isCompleted}
           completedCount={briefing.completedCount}
           activeView={activeView}
@@ -90,6 +91,7 @@ export default function App() {
             <RespostasView
               getValue={briefing.getValue}
               getProgress={briefing.getProgress}
+              getSegment={briefing.getSegment}
               isCompleted={briefing.isCompleted}
               generateBriefingText={briefing.generateBriefingText}
               completedCount={briefing.completedCount}
@@ -102,6 +104,7 @@ export default function App() {
                 getValue={briefing.getValue}
                 setValue={briefing.setValue}
                 getProgress={briefing.getProgress}
+                getSegment={briefing.getSegment}
                 isCompleted={briefing.isCompleted}
                 markComplete={briefing.markComplete}
                 generateBriefingText={briefing.generateBriefingText}
